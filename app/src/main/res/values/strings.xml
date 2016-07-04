@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Salva tu vida</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="texto_principal">Salva tu vida, con un clic</string>
+    <string name="action_post_facebook">Capturar foto</string>
+    <string name="text_auxilio">Pide ayuda !!</string>
+    <string name="facebook_app_id">620252598155584</string>
+
+</resources>

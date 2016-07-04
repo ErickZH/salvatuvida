@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="itch.salvatuvida.MainActivity"
+    tools:showIn="@layout/activity_main"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+   <ImageView
+       android:layout_width="198dp"
+       android:layout_height="294dp"
+       android:src="@drawable/microphone"
+       android:layout_gravity="center_horizontal" />
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/texto_principal"
+       android:textSize="20dp"
+       android:layout_gravity="center"/>
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="98dp"
+       android:orientation="vertical"
+       android:layout_weight="0.18">
+
+      <ImageButton
+          android:id="@+id/boton_voz"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:src="@drawable/record"
+          android:layout_marginTop="30dp"
+          android:background="@drawable/ripple"
+          android:layout_gravity="center_horizontal"/>
+   </LinearLayout>
+
+</LinearLayout>
