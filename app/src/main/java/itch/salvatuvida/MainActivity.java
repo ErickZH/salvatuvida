@@ -2,6 +2,7 @@ package itch.salvatuvida;
 
 
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,17 +13,21 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.jar.Manifest;
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //inicializamos el sdk de Facebook
         FacebookSdk.sdkInitialize(getApplicationContext());
 
 
@@ -65,8 +71,105 @@ public class MainActivity extends AppCompatActivity
                 startVoiceRecognitionActivity();
             }
         });
+        // Asegurarnos que los archivos de ajustes existen
+        // Archivo SMS
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput("sms.txt")));
+        }catch (Exception e)
+        {
+            // no existe
+            Toast.makeText(getApplicationContext(),"Necesitas tener configurado algun numero en Ajustes",Toast.LENGTH_SHORT).show();
+            // pedir mediante un AlertDialog el numero y crear el archivo
+            lanzar_alerta("Enviar SMS en caso de auxilio a",1);
+        }
+        // Archivo Llamar
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput("llamar.txt")));
+        }catch (Exception e)
+        {
+            // no existe
+            Toast.makeText(getApplicationContext(),"Necesitas tener configurado algun numero en Ajustes",Toast.LENGTH_SHORT).show();
+            // pedir mediante un AlertDialog el numero y crear el archivo
+            lanzar_alerta("Llamar en caso de auxilio a",2);
+        }
+
+
 
     }
+
+    public void lanzar_alerta(String titulo, int codigo_mensaje)
+    {
+        Log.e("EZH","Lanzar alerta - Codigo de mensaje: "+codigo_mensaje);
+        AlertDialog ad = alerta(codigo_mensaje);
+        Log.e("EZH","Lanzar alerta - Despues del alert");
+        ad.setTitle(titulo);
+        ad.setCancelable(true);
+        ad.show();
+    }
+
+    public AlertDialog alerta(final int codigo_mensaje)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.alerta, null);
+        final EditText et = (EditText) v.findViewById(R.id.numTelefono);
+        // eventos
+        builder.setPositiveButton("Guardar",
+                new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                        Log.e("EZH","Ajustes - Guardar");
+                        // validamos que el editText no este vacio
+                        if (!et.getText().toString().equals(""))
+                        {
+                            Log.e("EZH","Ajustes - Guardar - No esta vacio el EditText");
+                            // Guardamos numero telefonico
+                            String numero_telefono = et.getText().toString();
+                            // validamos que numero se va a guardar (SMS o Llamada)
+                            if (codigo_mensaje == 1)
+                            {
+                                // guardar numero en el archivo sms.txt
+                                try
+                                {
+                                    OutputStreamWriter osw = new OutputStreamWriter(openFileOutput("sms.txt",MODE_PRIVATE));
+                                    osw.write(numero_telefono);
+                                    osw.flush();
+                                    osw.close();
+                                    Log.e("EZH","Ajustes - Guardar - Se guardo el numero para SMS");
+                                }catch (Exception e)
+                                {
+                                    Log.e("EZH","Error al guardar el número SMS"+numero_telefono);
+                                }
+                            }
+                            else
+                            {
+                                // guardar numero en el archivo llamar.txt
+                                try
+                                {
+                                    OutputStreamWriter osw = new OutputStreamWriter(openFileOutput("llamar.txt",MODE_PRIVATE));
+                                    osw.write(numero_telefono);
+                                    osw.flush();
+                                    osw.close();
+                                }catch (Exception e)
+                                {
+                                    Log.e("EZH","Error al guardar el número Llamada"+numero_telefono);
+                                }
+                            }
+                        }
+                    }
+                });
+
+        builder.setView(v);
+        return builder.create();
+    }
+
     private void startVoiceRecognitionActivity()
     {
         // Definición del intent para realizar en análisis del mensaje
